@@ -1,0 +1,309 @@
+/* ============================================================
+   Tema: "señal en vivo" — pensado para creadores de contenido.
+   Fondo casi negro con acento cian de transmisión + rosa de alerta,
+   tipografía técnica (Space Grotesk) para títulos, Inter para texto.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg: #0d0d10;
+  --surface: #16161b;
+  --surface-2: #1e1e25;
+  --line: #2a2a33;
+  --text: #f2f2f5;
+  --text-dim: #9a9aa5;
+  --signal: #4EE3C2;      /* cian "en vivo" */
+  --alert: #FF5C7A;       /* rosa de alerta / errores */
+  --signal-dim: rgba(78, 227, 194, 0.12);
+  --radius: 14px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, .brand {
+  font-family: 'Space Grotesk', sans-serif;
+  letter-spacing: -0.02em;
+}
+
+a { color: inherit; }
+
+.wrap {
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* ---------- Header ---------- */
+header.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 22px 0;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-decoration: none;
+}
+
+.brand .dot {
+  width: 9px; height: 9px;
+  border-radius: 50%;
+  background: var(--signal);
+  box-shadow: 0 0 0 4px var(--signal-dim);
+}
+
+.top nav { display: flex; gap: 14px; align-items: center; }
+
+.btn {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--text);
+  padding: 9px 16px;
+  border-radius: 10px;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color .15s ease, transform .1s ease;
+}
+.btn:hover { border-color: var(--signal); }
+.btn:active { transform: scale(0.98); }
+.btn.primary {
+  background: var(--signal);
+  border-color: var(--signal);
+  color: #06231d;
+}
+.btn.primary:hover { filter: brightness(1.05); }
+.btn.ghost { background: transparent; }
+.btn.small { padding: 6px 12px; font-size: 0.8rem; }
+.btn.danger { color: var(--alert); border-color: var(--alert); background: transparent; }
+
+/* ---------- Hero ---------- */
+.hero { padding: 40px 0 24px; text-align: left; }
+.hero h1 {
+  font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+  line-height: 1.1;
+  margin: 0 0 10px;
+}
+.hero p {
+  color: var(--text-dim);
+  font-size: 1.02rem;
+  max-width: 52ch;
+  margin: 0;
+}
+
+/* ---------- Drop zone ---------- */
+.dropzone {
+  margin-top: 28px;
+  border: 1.5px dashed var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  padding: 46px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color .15s ease, background .15s ease;
+  position: relative;
+}
+.dropzone.drag {
+  border-color: var(--signal);
+  background: var(--signal-dim);
+}
+.dropzone .slot {
+  width: 54px; height: 8px;
+  background: var(--line);
+  border-radius: 6px;
+  margin: 0 auto 18px;
+}
+.dropzone.drag .slot { background: var(--signal); }
+.dropzone h3 { margin: 0 0 6px; font-size: 1.1rem; }
+.dropzone p { margin: 0; color: var(--text-dim); font-size: 0.88rem; }
+.dropzone input[type=file] { display: none; }
+
+/* ---------- Upload progress / result card ---------- */
+.card {
+  margin-top: 18px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+
+.progress-track {
+  height: 8px;
+  background: var(--surface-2);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--signal);
+  width: 0%;
+  transition: width .2s ease;
+}
+
+.link-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.link-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--signal);
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.88rem;
+  outline: none;
+}
+
+.error-text { color: var(--alert); font-size: 0.88rem; margin-top: 8px; }
+
+/* ---------- File list (dashboard) ---------- */
+.file-grid {
+  margin-top: 22px;
+  display: grid;
+  gap: 12px;
+}
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+.file-thumb {
+  width: 52px; height: 52px;
+  border-radius: 10px;
+  background: var(--surface-2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  overflow: hidden;
+  font-size: 1.3rem;
+}
+.file-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.file-meta { flex: 1; min-width: 0; }
+.file-meta .name { font-weight: 600; font-size: 0.92rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-meta .sub { color: var(--text-dim); font-size: 0.78rem; margin-top: 2px; }
+.file-actions { display: flex; gap: 6px; flex-shrink: 0; }
+
+/* ---------- Auth panel ---------- */
+.auth-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px;
+  max-width: 380px;
+}
+.auth-panel h3 { margin: 0 0 4px; }
+.auth-panel p.sub { color: var(--text-dim); font-size: 0.85rem; margin: 0 0 16px; }
+.oauth-grid { display: grid; gap: 8px; }
+.divider {
+  display: flex; align-items: center; gap: 10px;
+  color: var(--text-dim); font-size: 0.78rem;
+  margin: 16px 0;
+}
+.divider::before, .divider::after {
+  content: ""; flex: 1; height: 1px; background: var(--line);
+}
+.email-row { display: flex; gap: 8px; }
+.email-row input {
+  flex: 1;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 0.88rem;
+}
+
+/* ---------- File viewer page ---------- */
+.viewer {
+  margin-top: 30px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  overflow: hidden;
+}
+.viewer .media-box {
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+}
+.viewer img, .viewer video { width: 100%; max-height: 78vh; display: block; }
+.viewer audio { width: 100%; margin: 40px 24px; }
+.viewer .text-box {
+  width: 100%;
+  max-height: 78vh;
+  overflow: auto;
+  margin: 0;
+  padding: 24px;
+  color: var(--text);
+  background: var(--surface);
+  font-family: 'Space Grotesk', monospace;
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  text-align: left;
+  box-sizing: border-box;
+}
+.viewer .info {
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.viewer .info .name { font-weight: 600; font-size: 0.95rem; }
+.viewer .info .sub { color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
+
+/* ---------- Footer / description ---------- */
+footer.about {
+  margin: 60px 0 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.empty {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  padding: 30px 0;
+  text-align: center;
+}
+
+.hidden { display: none !important; }

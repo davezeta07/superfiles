@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Archivo compartido</title>
+<link rel="stylesheet" href="/style.css">
+<meta property="og:title" content="Archivo compartido">
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <a href="/" class="brand"><span class="dot"></span> <span id="brandName">SuperFiles</span></a>
+    <nav>
+      <a class="btn small primary" href="/">Enviar el mío</a>
+    </nav>
+  </header>
+
+  <div id="loadingState" class="empty">Cargando archivo…</div>
+  <div id="notFound" class="empty hidden">Este archivo no existe o fue eliminado.</div>
+
+  <div class="viewer hidden" id="viewer">
+    <div class="media-box" id="mediaBox"></div>
+    <div class="info">
+      <div>
+        <div class="name" id="fileName"></div>
+        <div class="sub" id="fileSub"></div>
+      </div>
+      <div class="file-actions">
+        <button class="btn small" id="copyBtn">Copiar enlace</button>
+        <a class="btn small primary" id="downloadBtn">Descargar</a>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="/config.js"></script>
+<script src="/app.js"></script>
+<script>
+document.getElementById('brandName').textContent = APP_CONFIG.APP_NAME;
+
+function humanSizeLocal(bytes) {
+  if (bytes < 1024) return bytes + " B";
+  const units = ["KB", "MB", "GB"];
+  let i = -1;
+  do { bytes /= 1024; i++; } while (bytes >= 1024 && i < units.length - 1);
+  return bytes.toFixed(1) + " " + units[i];
+}
+
+async function loadFile() {
+  const params = new URLSearchParams(window.location.search);
+  let id = params.get('id');
+  if (!id) {
+    // El navegador conserva la URL /f/xxxxx tal cual (el rewrite de Netlify
+    // no cambia lo que ve el navegador), así que si no vino por query string
+    // lo sacamos directo de la ruta.
+    const match = window.location.pathname.match(/\/f\/([^/?#]+)/);
+    if (match) id = match[1];
+  }
+  const loadingState = document.getElementById('loadingState');
+  const notFound = document.getElementById('notFound');
+  const viewer = document.getElementById('viewer');
+
+  if (!id) { loadingState.classList.add('hidden'); notFound.classList.remove('hidden'); return; }
+
+  const { data, error } = await sb.from('files').select('*').eq('id', id).single();
+
+  loadingState.classList.add('hidden');
+  if (error || !data) { notFound.classList.remove('hidden'); return; }
+
+  const url = publicUrlFor(data.storage_path);
+  const kind = fileKind(data.mime_type);
+  const mediaBox = document.getElementById('mediaBox');
+
+  if (kind === 'image') {
+    mediaBox.innerHTML = `<img src="${url}" alt="${data.original_name}">`;
+  } else if (kind === 'video') {
+    mediaBox.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
+  } else if (kind === 'audio') {
+    mediaBox.innerHTML = `<audio src="${url}" controls autoplay></audio>`;
+  } else if (kind === 'text') {
+    mediaBox.innerHTML = `<div class="text-box">Cargando texto…</div>`;
+    try {
+      const res = await fetch(url);
+      const text = await res.text();
+      const escaped = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+      mediaBox.innerHTML = `<pre class="text-box">${escaped}</pre>`;
+    } catch (e) {
+      mediaBox.innerHTML = `<div class="text-box">No se pudo cargar el contenido del texto.</div>`;
+    }
+  } else {
+    mediaBox.innerHTML = `<div style="padding:60px;color:var(--text-dim)">Vista previa no disponible para este tipo de archivo.</div>`;
+  }
+
+  document.title = data.original_name;
+  document.getElementById('fileName').textContent = data.original_name;
+  document.getElementById('fileSub').textContent = humanSizeLocal(data.size_bytes) + " · " + new Date(data.created_at).toLocaleDateString();
+  document.getElementById('downloadBtn').href = url;
+  document.getElementById('downloadBtn').setAttribute('download', data.original_name);
+
+  viewer.classList.remove('hidden');
+}
+
+document.getElementById('copyBtn').addEventListener('click', () => {
+  navigator.clipboard.writeText(window.location.href);
+  const btn = document.getElementById('copyBtn');
+  btn.textContent = "¡Copiado!";
+  setTimeout(() => btn.textContent = "Copiar enlace", 1200);
+});
+
+loadFile();
+</script>
+</body>
+</html>
